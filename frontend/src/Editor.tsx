@@ -23,7 +23,7 @@ export function Editor({ script, onScriptChange, onStart, error, busy }: Props) 
         disabled={busy}
       />
       <button onClick={onStart} disabled={!canStart}>
-        {busy ? 'Starting…' : 'Read back script'}
+        {busy ? 'Starting…' : 'Read Back Script'}
       </button>
     </section>
   );

@@ -47,7 +47,9 @@ button:disabled { background: #2a2f3a; color: #6b7280; cursor: not-allowed; }
 }
 
 .editor > button {
-  align-self: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .banner {
