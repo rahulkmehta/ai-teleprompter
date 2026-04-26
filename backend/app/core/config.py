@@ -2,8 +2,6 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Resolve .env relative to this file (backend/app/core/config.py → backend/.env)
-# so the path is stable no matter where uvicorn is launched from.
 ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 

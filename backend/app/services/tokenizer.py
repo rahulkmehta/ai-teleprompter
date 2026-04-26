@@ -1,9 +1,3 @@
-"""Tokenization feeding alignment.
-
-The script (once per session) and live transcripts (every Deepgram event) both
-flow through this module so their token surfaces match exactly when the aligner
-compares them.
-"""
 import re
 from dataclasses import dataclass
 

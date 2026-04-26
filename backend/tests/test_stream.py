@@ -1,14 +1,7 @@
-"""Tests for the /ws endpoint covering the mock-transcript path end-to-end.
-
-Validates the message protocol contract (init → ready, ingest_transcript →
-transcript+pointer+state) without needing real audio or Deepgram.
-"""
 from fastapi.testclient import TestClient
-
 from app.main import app
 
 client = TestClient(app)
-
 
 def test_ws_init_returns_ready():
     with client.websocket_connect("/ws") as ws:
