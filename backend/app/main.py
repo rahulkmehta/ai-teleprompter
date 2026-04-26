@@ -7,8 +7,6 @@ from app.core.config import settings
 
 def create_app() -> FastAPI:
     app = FastAPI(title="AI Teleprompter")
-
-    # This cannot be wildcarded in production
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
@@ -16,7 +14,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
     app.include_router(stream.router)
 
     @app.get("/health")
@@ -24,6 +21,5 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     return app
-
 
 app = create_app()

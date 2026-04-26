@@ -10,7 +10,7 @@
 // the backend, which feeds it to Deepgram.
 
 const TARGET_SAMPLE_RATE = 16000;
-const CHUNK_SAMPLES = 800; // 50ms at 16kHz
+const CHUNK_SAMPLES = 320; // 20ms at 16kHz — smaller chunks = lower capture latency
 
 class PCMWorklet extends AudioWorkletProcessor {
   constructor() {

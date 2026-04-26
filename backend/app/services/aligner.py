@@ -165,10 +165,16 @@ class Aligner:
 
         if re_anchored:
             self.committed_pointer = new_pointer
-        elif is_final:
-            self.committed_pointer = max(self.committed_pointer, new_pointer)
-
-        self.tentative_pointer = new_pointer
+            self.tentative_pointer = new_pointer
+        else:
+            if is_final:
+                self.committed_pointer = max(self.committed_pointer, new_pointer)
+            # Tentative pointer is forward-only (interim transcripts can change
+            # mid-utterance; we don't want the prompter to jitter backward) and
+            # never drops below committed.
+            self.tentative_pointer = max(
+                self.tentative_pointer, new_pointer, self.committed_pointer
+            )
         self.confidence = match.confidence
 
         on_script = self.low_confidence_streak < self.config.re_anchor_streak

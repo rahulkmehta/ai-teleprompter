@@ -1,4 +1,5 @@
-"""Tokenization that feeds alignment module
+"""
+Tokenization that feeds alignment module
 Both the script and live transcripts from Deepgram pass through this module so their token surfaces match exactly when the aligner compares them.
 Each Token carries the raw form (for display), normalized form (for matching), phonetic Metaphone code (for catching mispronunciations), and IDF weight (so common words don't dominate alignment).
 """
