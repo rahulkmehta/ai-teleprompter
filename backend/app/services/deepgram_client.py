@@ -1,21 +1,3 @@
-"""Deepgram LiveTranscription wrapper, owned by stream.py during a live session.
-
-Audio frames from the browser's AudioWorklet flow in via send_audio(); transcript
-events flow back out to a caller-provided async callback that feeds
-Aligner.process().
-
-Connects directly to wss://api.deepgram.com/v1/listen using `websockets` rather
-than the deepgram-sdk. Reason: the SDK 6.x serializes Python booleans as
-"True"/"False" (capitalized) in URL query params, but Deepgram requires lowercase
-"true"/"false" per JSON convention — every connect attempt returned HTTP 400.
-The protocol itself is simple enough that bypassing the SDK is cleaner than
-working around its encoder bug.
-
-Configuration pulled from app.core.config: model nova-3, encoding linear16 at
-16kHz, interim_results=true (sub-200ms tentative-pointer updates),
-smart_format/punctuate/numerals=false so the transcript is a raw word stream
-that mirrors how the script is tokenized.
-"""
 import asyncio
 import json
 import logging
@@ -29,11 +11,8 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-
 TranscriptCallback = Callable[[str, bool], Awaitable[None]]
-
 DEEPGRAM_WS_URL = "wss://api.deepgram.com/v1/listen"
-
 
 class DeepgramSTT:
     def __init__(self, on_transcript: TranscriptCallback):
@@ -89,7 +68,7 @@ class DeepgramSTT:
         try:
             await self._ws.send(audio)
         except ConnectionClosed:
-            pass  # receive loop will surface the disconnect
+            pass
 
     async def stop(self) -> None:
         if self._receive_task is not None:

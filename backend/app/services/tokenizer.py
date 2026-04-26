@@ -1,14 +1,8 @@
-"""Tokenization feeding the alignment pipeline.
+"""Tokenization feeding alignment.
 
 The script (once per session) and live transcripts (every Deepgram event) both
 flow through this module so their token surfaces match exactly when the aligner
-compares them. Each Token carries:
-
-  - raw:       original form, preserved for the teleprompter display
-  - norm:      lowercased, alphanumeric-only form used for matching
-  - metaphone: phonetic code so alignment survives mispronunciations
-  - idf:       inverse-rarity weight (via wordfreq) so common words don't
-               dominate alignment scoring
+compares them.
 """
 import re
 from dataclasses import dataclass

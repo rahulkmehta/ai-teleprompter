@@ -1,9 +1,4 @@
-"""Unit tests for the tokenizer                                                                                                                                                                                             
-                                                                                                                                                                                                                                        
-Basically, we want to make sure the script and transcript pipelines                                                                                                                                                           
-produce identical token surfaces. Otherwise, the aligner will get all messed up.                                                                                                                                                                 
-"""                                                                                                                                                                                                                                     
-import pytest                                                                                                                                                                                                                             
+import pytest
                                                                                                                                                                                                                                         
 from app.services.tokenizer import (                                                                                                                                                                                                      
     MIN_IDF,                                                                                                                                                                                                                              

@@ -1,20 +1,3 @@
-"""Local sequence alignment that maps live transcript tokens to script positions.
-
-Consumed by app.api.stream once per WebSocket session. Each transcript event
-from Deepgram (interim or final) calls Aligner.process(text, is_final), which
-runs Smith-Waterman local alignment over a rolling buffer of recent transcript
-tokens against a forward window of script tokens, and returns the new pointer.
-
-Three layers, each independently testable:
-  - score(): per-token similarity (exact + phonetic + edit-distance) weighted
-    by the script token's IDF, so common words don't dominate.
-  - align(): pure DP that finds the best local alignment of buffer tokens
-    ending in the window. Returns where the last spoken token landed.
-  - Aligner: holds session state (committed/tentative pointers, rolling
-    transcript buffer, low-confidence streak), applies guardrails (forward
-    jump cap, sentence-bounded monotonicity, confidence floor), and
-    triggers full-script re-anchor when off-script for too long.
-"""
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Literal
@@ -29,13 +12,10 @@ from app.services.tokenizer import (
     tokenize_transcript,
 )
 
-
 GAP_PENALTY = -0.1
 EXPECTED_AVG_IDF = 0.2
 
-
 def score(t1: Token, t2: Token, config: Settings) -> float:
-    # _build_token guarantees t1.norm and t2.norm are non-empty.
     s_exact = 1.0 if t1.norm == t2.norm else 0.0
     s_phonetic = 1.0 if t1.metaphone and t1.metaphone == t2.metaphone else 0.0
     max_len = max(len(t1.norm), len(t2.norm))
@@ -156,14 +136,11 @@ class Aligner:
                     re_anchored = True
 
         if re_anchored:
-            # Re-anchor is a hard reset — both pointers snap to the new position.
             self.committed_pointer = new_pointer
             self.tentative_pointer = new_pointer
         else:
             if is_final:
                 self.committed_pointer = max(self.committed_pointer, new_pointer)
-            # Forward-only on tentative: interims can retract themselves
-            # ("hello there" → "hello their"); we don't want a backward scroll.
             self.tentative_pointer = max(
                 self.tentative_pointer, new_pointer, self.committed_pointer
             )

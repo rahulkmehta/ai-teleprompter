@@ -1,10 +1,3 @@
-"""Tests for the aligner: scoring, DP alignment, and the stateful Aligner.
-
-Pins the behavior the alignment pipeline must hold up against the spec's four
-off-script failure modes (ad-lib, rephrasing, mispronunciation, skipped words),
-plus the guardrails that prevent runaway pointer movement and the full-script
-re-anchor when sustained off-script.
-"""
 import pytest
 
 from app.core.config import Settings
@@ -39,9 +32,6 @@ def aligner(config: Settings) -> Aligner:
     return Aligner(script=tokenize_script(SCRIPT), config=config)
 
 
-# --- score() ---
-
-
 def test_score_exact_rare_match_is_significant(config: Settings):
     a = tokenize_transcript("subterranean")[0]
     b = tokenize_transcript("subterranean")[0]
@@ -64,9 +54,6 @@ def test_score_unrelated_tokens_low(config: Settings):
     a = tokenize_transcript("quantum")[0]
     b = tokenize_transcript("dog")[0]
     assert score(a, b, config) < 0.3
-
-
-# --- align() ---
 
 
 def test_align_perfect_read_advances_to_end_of_buffer(config: Settings):
@@ -99,9 +86,6 @@ def test_align_empty_buffer_no_movement(config: Settings):
     assert match.confidence == 0.0
 
 
-# --- Aligner: spec failure modes ---
-
-
 def test_aligner_perfect_read_advances(aligner: Aligner):
     aligner.process("The quick brown fox", is_final=True)
     assert aligner.committed_pointer >= 3
@@ -126,9 +110,6 @@ def test_aligner_skipped_sentence_advances_via_forward_alignment(aligner: Aligne
     p1 = aligner.committed_pointer
     aligner.process("subterranean rivers flow beneath", is_final=True)
     assert aligner.committed_pointer > p1
-
-
-# --- Aligner: guardrails ---
 
 
 def test_aligner_forward_jump_capped(aligner: Aligner):
