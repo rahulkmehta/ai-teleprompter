@@ -1,19 +1,10 @@
-// The reading view. Renders each script word as a positioned span and
-// translates the content vertically so the current word sits at ~25% from the
-// top of a 4-line viewport. Driven entirely by the `pointer` prop, which the
-// parent (App.tsx) updates on each PointerMessage from the backend aligner.
-//
-// The CSS transition on transform handles the smooth scroll: each pointer
-// update sets a new `--target-y` and the browser interpolates. Mid-flight
-// target changes are handled gracefully by the transition.
-
 import { useEffect, useMemo, useRef } from 'react';
 import type { ScriptStatus } from './types';
 
 const WORD_RE = /[a-zA-Z0-9]+(?:'[a-zA-Z0-9]+)*/g;
 const VIEWPORT_LOOKAHEAD = 0.25;
 
-type Props = {
+type TeleprompterProps = {
   script: string;
   pointer: number;
   confidence: number;
@@ -21,7 +12,7 @@ type Props = {
   onStop: () => void;
 };
 
-export function Teleprompter({ script, pointer, confidence, status, onStop }: Props) {
+export function Teleprompter({ script, pointer, confidence, status, onStop }: TeleprompterProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 

@@ -1,25 +1,3 @@
-"""WebSocket endpoint hosting one teleprompter session per connection.
-
-Sits between the network (FastAPI) and the alignment pipeline (services.aligner).
-On init, parses the script and constructs the per-session Aligner. Inbound
-control messages (init, stop, ingest_transcript for mock testing) and binary
-audio frames (forwarded to Deepgram via DeepgramSTT) drive the aligner;
-pointer/state updates flow back as JSON messages.
-
-Message protocol:
-  Client → Server (text JSON):
-    {type: "init", script: str}
-    {type: "stop"}
-    {type: "ingest_transcript", text: str, is_final: bool}   # mock path
-  Client → Server (binary): PCM Int16 16kHz audio frames     # real STT path
-
-  Server → Client (text JSON):
-    {type: "ready", token_count: int}
-    {type: "pointer", index: int, confidence: float, tentative: bool}
-    {type: "transcript", text: str, is_final: bool}
-    {type: "state", status: "on_script"|"off_script"|"idle"}
-    {type: "error", message: str, recoverable: bool}
-"""
 import json
 import logging
 
@@ -41,13 +19,10 @@ from app.services.deepgram_client import DeepgramSTT
 from app.services.tokenizer import tokenize_script
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter()
-
 
 async def _send(ws: WebSocket, msg: BaseModel) -> None:
     await ws.send_text(msg.model_dump_json())
-
 
 async def _emit_alignment(
     ws: WebSocket, transcript: str, is_final: bool, result: AlignmentResult

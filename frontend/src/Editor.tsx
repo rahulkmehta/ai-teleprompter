@@ -1,8 +1,4 @@
-// The script-entry view, shown when the app is idle. The user pastes or types
-// their script and clicks "Read back" to transition to the Teleprompter view
-// (handled by the parent App.tsx).
-
-type Props = {
+type EditorProps = {
   script: string;
   onScriptChange: (value: string) => void;
   onStart: () => void;
@@ -10,7 +6,7 @@ type Props = {
   busy: boolean;
 };
 
-export function Editor({ script, onScriptChange, onStart, error, busy }: Props) {
+export function Editor({ script, onScriptChange, onStart, error, busy }: EditorProps) {
   const canStart = script.trim().length > 0 && !busy;
   return (
     <section className="editor">

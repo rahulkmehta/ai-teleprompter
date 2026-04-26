@@ -1,13 +1,3 @@
-// Top-level state machine + glue.
-//
-// idle    → editor view (paste/type a script)
-//   ↓ Read back
-// starting → request mic, open WS, send {type:"init"}, start PCMCapture
-//   ↓ on success
-// recording → teleprompter view; pointer updates flow in via WSClient
-//   ↓ Stop
-// stopping → close WS, stop AudioContext, reset, back to idle
-
 import { useRef, useState } from 'react';
 import { Editor } from './Editor';
 import { Teleprompter } from './Teleprompter';

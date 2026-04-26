@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     window_size: int = 20
     buffer_size: int = 8
     confidence_floor: float = 0.4
-    max_forward_jump: int = 8
+    max_forward_jump: int = 5
     re_anchor_streak: int = 5
     re_anchor_confidence: float = 0.6
     alpha_exact: float = 0.5

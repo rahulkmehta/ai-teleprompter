@@ -1,9 +1,4 @@
-// Thin WebSocket client used by App.tsx during a recording session.
-//
-// Sends control JSON ({type: "init", ...}) and binary PCM Int16 frames from
-// PCMCapture (audio.ts) to the backend at /ws (proxied by Vite to FastAPI on
-// :8000). Receives ServerMessage variants and dispatches to typed handlers
-// that App.tsx provides for UI updates.
+// Thin WebSocket client used by App.tsx
 
 import type { ScriptStatus, ServerMessage } from './types';
 
