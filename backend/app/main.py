@@ -6,7 +6,7 @@ from app.core.config import settings
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="AI Teleprompter")
+    app = FastAPI(title="Teleprompter")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,

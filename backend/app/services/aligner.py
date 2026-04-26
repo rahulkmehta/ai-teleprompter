@@ -35,13 +35,11 @@ EXPECTED_AVG_IDF = 0.2
 
 
 def score(t1: Token, t2: Token, config: Settings) -> float:
+    # _build_token guarantees t1.norm and t2.norm are non-empty.
     s_exact = 1.0 if t1.norm == t2.norm else 0.0
     s_phonetic = 1.0 if t1.metaphone and t1.metaphone == t2.metaphone else 0.0
-    if t1.norm and t2.norm:
-        max_len = max(len(t1.norm), len(t2.norm))
-        s_lev = 1.0 - (Levenshtein.distance(t1.norm, t2.norm) / max_len)
-    else:
-        s_lev = 0.0
+    max_len = max(len(t1.norm), len(t2.norm))
+    s_lev = 1.0 - Levenshtein.distance(t1.norm, t2.norm) / max_len
     raw = (
         config.alpha_exact * s_exact
         + config.beta_phonetic * s_phonetic
@@ -64,14 +62,9 @@ def align(
     *,
     window_size: int | None = None,
 ) -> Match:
-    if not buffer or current_pointer >= len(script):
-        return Match(pointer=current_pointer, confidence=0.0)
-
     size = window_size if window_size is not None else config.window_size
-    end = min(current_pointer + size, len(script))
-    window = script.tokens[current_pointer:end]
-
-    if not window:
+    window = script.tokens[current_pointer : current_pointer + size]
+    if not buffer or not window:
         return Match(pointer=current_pointer, confidence=0.0)
 
     n = len(buffer)
@@ -139,8 +132,7 @@ class Aligner:
     def process(self, text: str, is_final: bool) -> AlignmentResult:
         new_tokens = tokenize_transcript(text)
         if is_final:
-            for tok in new_tokens:
-                self.final_tokens.append(tok)
+            self.final_tokens.extend(new_tokens)
             self.interim_tokens = []
         else:
             self.interim_tokens = new_tokens
@@ -164,14 +156,14 @@ class Aligner:
                     re_anchored = True
 
         if re_anchored:
+            # Re-anchor is a hard reset — both pointers snap to the new position.
             self.committed_pointer = new_pointer
             self.tentative_pointer = new_pointer
         else:
             if is_final:
                 self.committed_pointer = max(self.committed_pointer, new_pointer)
-            # Tentative pointer is forward-only (interim transcripts can change
-            # mid-utterance; we don't want the prompter to jitter backward) and
-            # never drops below committed.
+            # Forward-only on tentative: interims can retract themselves
+            # ("hello there" → "hello their"); we don't want a backward scroll.
             self.tentative_pointer = max(
                 self.tentative_pointer, new_pointer, self.committed_pointer
             )
