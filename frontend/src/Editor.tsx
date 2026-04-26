@@ -14,7 +14,7 @@ export function Editor({ script, onScriptChange, onStart, error, busy }: Props) 
   const canStart = script.trim().length > 0 && !busy;
   return (
     <section className="editor">
-      <h1>AI Teleprompter</h1>
+      <h1>Teleprompter</h1>
       {error && <div className="banner banner-error">{error}</div>}
       <textarea
         value={script}

@@ -69,7 +69,7 @@ export function Teleprompter({ script, pointer, confidence, status, onStop }: Pr
       <div className="prompter-controls">
         <span className="recording-dot" aria-hidden="true" />
         <span className={`status status-${status}`}>{status.replace('_', ' ')}</span>
-        <span className="confidence">conf {(confidence * 100).toFixed(0)}%</span>
+        <span className="confidence">Confidence {(confidence * 100).toFixed(0)}%</span>
         <button onClick={onStop}>Stop</button>
       </div>
     </section>

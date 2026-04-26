@@ -17,11 +17,11 @@ class Settings(BaseSettings):
     deepgram_api_key: str = ""
     deepgram_model: str = "nova-3"
     deepgram_language: str = "en-US"
-    deepgram_endpointing_ms: int = 100
+    deepgram_endpointing_ms: int = 25
     deepgram_utterance_end_ms: int = 1000
 
     sample_rate: int = 16000
-    chunk_ms: int = 20
+    chunk_ms: int = 10
 
     window_size: int = 20
     buffer_size: int = 8
