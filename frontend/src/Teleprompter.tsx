@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { ScriptStatus } from './types';
 
-const WORD_RE = /[a-zA-Z0-9]+(?:'[a-zA-Z0-9]+)*/g;
+// Each rendered token is one alphanumeric run (the matchable "word") plus any
+// adjacent punctuation — leading openers (quotes, parens) and trailing closers
+// (commas, periods, exclamation, etc.). Token *count* still matches the
+// backend's WORD_REGEX, so pointer indices stay aligned; we're just pulling
+// more visible characters into each span so punctuation renders.
+const WORD_RE = /[^\sa-zA-Z0-9]*[a-zA-Z0-9]+(?:'[a-zA-Z0-9]+)*[^\sa-zA-Z0-9]*/g;
 const VIEWPORT_LOOKAHEAD = 0.25;
 
 type TeleprompterProps = {
