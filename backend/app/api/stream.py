@@ -1,3 +1,4 @@
+import contextlib
 import json
 import logging
 
@@ -21,8 +22,10 @@ from app.services.tokenizer import tokenize_script
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
 async def _send(ws: WebSocket, msg: BaseModel) -> None:
     await ws.send_text(msg.model_dump_json())
+
 
 async def _emit_alignment(
     ws: WebSocket, transcript: str, is_final: bool, result: AlignmentResult
@@ -72,7 +75,9 @@ async def stream(ws: WebSocket) -> None:
                     try:
                         init = InitMessage(**data)
                     except ValidationError as e:
-                        await _send(ws, ErrorMessage(message=f"invalid init: {e.errors()}"))
+                        await _send(
+                            ws, ErrorMessage(message=f"invalid init: {e.errors()}")
+                        )
                         continue
 
                     script = tokenize_script(init.script)
@@ -93,13 +98,18 @@ async def stream(ws: WebSocket) -> None:
                     try:
                         ingest = IngestTranscriptMessage(**data)
                     except ValidationError as e:
-                        await _send(ws, ErrorMessage(message=f"invalid transcript: {e.errors()}"))
+                        await _send(
+                            ws,
+                            ErrorMessage(message=f"invalid transcript: {e.errors()}"),
+                        )
                         continue
                     result = aligner.process(ingest.text, ingest.is_final)
                     await _emit_alignment(ws, ingest.text, ingest.is_final, result)
 
                 else:
-                    await _send(ws, ErrorMessage(message=f"unknown message type: {msg_type}"))
+                    await _send(
+                        ws, ErrorMessage(message=f"unknown message type: {msg_type}")
+                    )
 
             elif "bytes" in event:
                 if aligner is None:
@@ -126,7 +136,10 @@ async def stream(ws: WebSocket) -> None:
                         await _send(
                             ws,
                             ErrorMessage(
-                                message="DEEPGRAM_API_KEY not configured; audio frames ignored",
+                                message=(
+                                    "DEEPGRAM_API_KEY not configured; "
+                                    "audio frames ignored"
+                                ),
                                 recoverable=True,
                             ),
                         )
@@ -138,10 +151,10 @@ async def stream(ws: WebSocket) -> None:
         pass
     except Exception as e:
         logger.exception("WebSocket session error")
-        try:
-            await _send(ws, ErrorMessage(message=f"server error: {e}", recoverable=False))
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            await _send(
+                ws, ErrorMessage(message=f"server error: {e}", recoverable=False)
+            )
     finally:
         if stt is not None:
             await stt.stop()

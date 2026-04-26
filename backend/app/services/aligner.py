@@ -15,6 +15,7 @@ from app.services.tokenizer import (
 GAP_PENALTY = -0.1
 EXPECTED_AVG_IDF = 0.2
 
+
 def score(t1: Token, t2: Token, config: Settings) -> float:
     s_exact = 1.0 if t1.norm == t2.norm else 0.0
     s_phonetic = 1.0 if t1.metaphone and t1.metaphone == t2.metaphone else 0.0
@@ -89,7 +90,7 @@ class Aligner:
 
     def buffer(self) -> list[Token]:
         combined = list(self.final_tokens) + self.interim_tokens
-        return combined[-self.config.buffer_size:]
+        return combined[-self.config.buffer_size :]
 
     def _try_reanchor(self) -> Match | None:
         buf = self.buffer()
@@ -122,8 +123,12 @@ class Aligner:
         re_anchored = False
 
         if match.confidence >= self.config.confidence_floor:
-            candidate = min(match.pointer, self.tentative_pointer + self.config.max_forward_jump)
-            sentence_start, _ = find_sentence(self.committed_pointer, self.script.sentences)
+            candidate = min(
+                match.pointer, self.tentative_pointer + self.config.max_forward_jump
+            )
+            sentence_start, _ = find_sentence(
+                self.committed_pointer, self.script.sentences
+            )
             new_pointer = max(candidate, sentence_start)
             self.low_confidence_streak = 0
         else:

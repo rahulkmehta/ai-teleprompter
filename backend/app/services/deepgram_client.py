@@ -1,8 +1,9 @@
 import asyncio
+import contextlib
 import json
 import logging
 import urllib.parse
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 import websockets
 from websockets.exceptions import ConnectionClosed
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 TranscriptCallback = Callable[[str, bool], Awaitable[None]]
 DEEPGRAM_WS_URL = "wss://api.deepgram.com/v1/listen"
+
 
 class DeepgramSTT:
     def __init__(self, on_transcript: TranscriptCallback):
@@ -65,18 +67,14 @@ class DeepgramSTT:
     async def send_audio(self, audio: bytes) -> None:
         if self._ws is None:
             return
-        try:
+        with contextlib.suppress(ConnectionClosed):
             await self._ws.send(audio)
-        except ConnectionClosed:
-            pass
 
     async def stop(self) -> None:
         if self._receive_task is not None:
             self._receive_task.cancel()
-            try:
+            with contextlib.suppress(BaseException):
                 await self._receive_task
-            except BaseException:
-                pass
             self._receive_task = None
 
         if self._ws is not None:

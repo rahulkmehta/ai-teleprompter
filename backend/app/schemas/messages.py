@@ -14,6 +14,7 @@ class StopMessage(BaseModel):
 
 class IngestTranscriptMessage(BaseModel):
     """Client-side transcript injection for mock testing without audio."""
+
     type: Literal["ingest_transcript"]
     text: str
     is_final: bool

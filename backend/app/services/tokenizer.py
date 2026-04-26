@@ -4,7 +4,6 @@ from dataclasses import dataclass
 import jellyfish
 from wordfreq import zipf_frequency
 
-
 WORD_REGEX = re.compile(r"[a-zA-Z0-9]+(?:'[a-zA-Z0-9]+)*")
 SENTENCE_END_REGEX = re.compile(r"[.!?]+(?:\s+|$)")
 MAX_ZIPF = 8.0

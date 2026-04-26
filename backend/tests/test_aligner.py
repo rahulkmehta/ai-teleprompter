@@ -1,9 +1,7 @@
 import pytest
-
 from app.core.config import Settings
 from app.services.aligner import Aligner, align, score
 from app.services.tokenizer import tokenize_script, tokenize_transcript
-
 
 SCRIPT = (
     "The quick brown fox jumps over the lazy dog. "
